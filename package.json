@@ -1,0 +1,16 @@
+{
+  "name": "image-optimize",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/minetaro12/image-optimize",
+  "author": "minetaro12 <osawa2003@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+  	"start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.2",
+    "multer": "^1.4.4",
+    "sharp": "^0.30.0"
+  }
+}
