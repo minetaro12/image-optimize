@@ -8,7 +8,9 @@
     <h1>画像圧縮</h1>
     <form action="/upload" method="post" enctype="multipart/form-data">
       <input type="file" name="file" accept="image/*">
-      <button type="submit">送信</button>
+      <br>
+      リサイズ:<input type="number" name="size">%
+      <input type="submit" value="送信">
     </form>
   </body>
 </html>
