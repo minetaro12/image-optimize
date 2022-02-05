@@ -8,6 +8,10 @@ const upload = multer({ dest: 'tmp/' });
 const sharp = require('sharp');
 const fs = require('fs')
 
+app.get('/upload', (req, res) => {
+	res.sendFile(__dirname + '/public/client.html');
+});
+
 app.post('/upload', upload.single('file'), (req, res) => {
 	try {
 		console.log(req.file.path);
