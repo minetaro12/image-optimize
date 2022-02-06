@@ -7,9 +7,10 @@
   <body>
     <h1>画像圧縮</h1>
     <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" accept="image/*">
+      <input type="file" name="file" accept="image/*" required>
       <br>
-      リサイズ:<input type="number" name="size">%
+      リサイズ:<input type="number" name="size" min="1" max="100">%
+      <br>
       <input type="submit" value="送信">
     </form>
   </body>
