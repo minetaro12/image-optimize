@@ -15,9 +15,20 @@ const sharp = require('sharp');
 const sizeOf = require('image-size');
 const fs = require('fs');
 
+const remove = function(file) { //一時ファイルの削除
+  if(file) {
+    try {
+      fs.unlinkSync(file);
+      console.log('Removed:' + file);
+    } catch(e) {
+      console.log('Remove Error:' + file);
+    };
+  };
+};
+
 app.use(express.urlencoded({extended: true})); //form形式で受け取れるように
 
-app.get('/upload', (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/client.html');
 });
 
@@ -54,25 +65,25 @@ app.post('/upload', upload.single('file'), (req, res) => {
     };
     var outpath = 'tmp/' + outname
     image.toFile(outpath, (err, info) => {
-      console.log(info);
-      console.log(outpath);
-      var outfile = fs.readFileSync(outpath);
-      res.set({'Content-Disposition': `attachment; filename=${outname}`});
-      res.send(outfile);
-      fs.unlinkSync(req.file.path);
-      fs.unlinkSync(outpath);
+      try {
+        console.log(info);
+        console.log(outpath);
+        var outfile = fs.readFileSync(outpath);
+        res.set({'Content-Disposition': `attachment; filename=${outname}`});
+        res.send(outfile);
+        remove(req.file.path);
+        remove(outpath);
+      } catch(e) {
+        res.status(500).send('Error');
+        remove(req.file.path);
+        remove(outpath);
+      };
     });
   } catch(e) {
     res.status(500).send('Error');
     console.log(e);
-    fs.unlinkSync(req.file.path, (err) => {
-      console.log('do not exist');
-    });
-    if(outpath) {
-      fs.unlinkSync(outpath, (err) => {
-       console.log('do not exist');
-      });
-    };
+    remove(req.file.path);
+    remove(outpath);
   };
 });
 

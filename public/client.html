@@ -2,24 +2,21 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width,initial-scale=1.0" http-equiv="content-type" charset="utf-8">
-    <title>Client</title>
+    <title>画像圧縮</title>
   </head>
   <body>
     <h1>画像圧縮</h1>
     <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" accept="image/*" required>
-      <br>
-      フォーマット:<select name="format">
+      <p><input type="file" name="file" accept="image/*" required></p>
+      <p>フォーマット:<select name="format">
         <option value="jpg">jpeg</option>
         <option value="webp">webp</option>
         <option value="png">png</option>
-      </select>
-      <br>
-      リサイズ:<input type="number" value="100" name="size" min="1" max="100" required>%
-      <br>
-      画質:<input type="number" value="75" name="quality" min="1" max="100" required>
-      <br>
-      <input type="submit" value="送信">
+      </select></p>
+      <p>リサイズ:<input type="number" value="100" name="size" min="1" max="100" required>%</p>
+      <p>画質:<input type="number" value="75" name="quality" min="1" max="100" required></p>
+      <p><input type="submit" value="圧縮"></p>
+      <p>アップロードされた画像データは変換終了後に削除されます</p>
     </form>
   </body>
 </html>
