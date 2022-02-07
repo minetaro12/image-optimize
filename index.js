@@ -35,40 +35,42 @@ app.get('/', (req, res) => {
 app.post('/upload', upload.single('file'), (req, res) => {
   try {
     console.log('\n' + req.file.path + '\n quality:' + req.body.quality + '\n format:' + req.body.format + '\n size:' + req.body.size);
-    var image = sharp(req.file.path);
+    let image = sharp(req.file.path);
     if (!isNaN(req.body.size) && req.body.size != '' && req.body.size != '100') { //sizeが指定されている場合はリサイズ
-      var dimensions = sizeOf(req.file.path); //元画像のサイズを取得
-      var outwidth = Math.round(dimensions.width * ( req.body.size / 100 )); //sizeからサイズを計算&四捨五入
+      let inwidth = sizeOf(req.file.path).width; //元画像の横サイズを取得
+      let outwidth = Math.round(inwidth * ( req.body.size / 100 )); //sizeからサイズを計算&四捨五入
       image.resize(outwidth, null);
       console.log('Resized');
     };
+    let outquality;
     if (!isNaN(req.body.quality) && req.body.quality != '') { //qualityがあれば指定
-      var numquality = Number(req.body.quality);
-      if (1 <= numquality <= 100) {
-        var outquality = numquality;
+      let numquality = Number(req.body.quality);
+      if (1 <= numquality && numquality <= 100) {
+        outquality = numquality;
       } else {
-        var outquality =75;
+        outquality = 75;
       };
     } else { //なければ75
-      var outquality = 75;
+      outquality = 75;
     };
+    let outname;
     if (req.body.format == 'jpeg' || req.body.format == 'jpg' || req.body.format == 'png' || req.body.format == 'webp') { //formatがあれば指定
       image.toFormat(req.body.format, {
         quality: outquality
       });
-      var outname = req.file.filename + '_out.' + req.body.format;
+      outname = req.file.filename + '_out.' + req.body.format;
     } else {
       image.toFormat('jpg', { //なければjpg
         quality: outquality
       });
-      var outname = req.file.filename + '_out.jpg';
+      outname = req.file.filename + '_out.jpg';
     };
-    var outpath = 'tmp/' + outname
+    let outpath = 'tmp/' + outname
     image.toFile(outpath, (err, info) => {
       try {
         console.log(info);
         console.log(outpath);
-        var outfile = fs.readFileSync(outpath);
+        let outfile = fs.readFileSync(outpath);
         res.set({'Content-Disposition': `attachment; filename=${outname}`});
         res.send(outfile);
         remove(req.file.path);
