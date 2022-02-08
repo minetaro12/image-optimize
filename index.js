@@ -16,13 +16,11 @@ const sizeOf = require('image-size');
 const fs = require('fs');
 
 const remove = function(file) { //一時ファイルの削除
-  if(file) {
-    try {
-      fs.unlinkSync(file);
-      console.log('Removed:' + file);
-    } catch(e) {
-      console.log('Remove Error:' + file);
-    };
+  try {
+    fs.unlinkSync(file);
+    console.log('Removed:' + file);
+  } catch(e) {
+    console.log('Remove Error:' + file);
   };
 };
 
@@ -34,14 +32,26 @@ app.get('/', (req, res) => {
 
 app.post('/upload', upload.single('file'), (req, res) => {
   try {
-    console.log('\n' + req.file.path + '\n quality:' + req.body.quality + '\n format:' + req.body.format + '\n size:' + req.body.size);
-    let image = sharp(req.file.path);
+    //ファイルがあるかどうか
+    if (typeof req.file == 'undefined') {throw new Error('No file')};
+
+    //画像かどうか
+    if (req.file.mimetype == 'image/jpeg' || req.file.mimetype == 'image/png' || req.file.mimetype == 'image/webp') {
+      //そのまま続行
+    } else {
+      throw new Error('Invalid type')
+    };
+
+    console.log('\n' + req.file.path + '\n mimetype:' + req.file.mimetype + '\n quality:' + req.body.quality + '\n format:' + req.body.format + '\n size:' + req.body.size);
+    const image = sharp(req.file.path);
+
     if (!isNaN(req.body.size) && req.body.size != '' && req.body.size != '100') { //sizeが指定されている場合はリサイズ
       let inwidth = sizeOf(req.file.path).width; //元画像の横サイズを取得
       let outwidth = Math.round(inwidth * ( req.body.size / 100 )); //sizeからサイズを計算&四捨五入
       image.resize(outwidth, null);
       console.log('Resized');
     };
+
     let outquality;
     if (!isNaN(req.body.quality) && req.body.quality != '') { //qualityがあれば指定
       let numquality = Number(req.body.quality);
@@ -53,6 +63,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     } else { //なければ75
       outquality = 75;
     };
+
     let outname;
     if (req.body.format == 'jpeg' || req.body.format == 'jpg' || req.body.format == 'png' || req.body.format == 'webp') { //formatがあれば指定
       image.toFormat(req.body.format, {
@@ -65,11 +76,12 @@ app.post('/upload', upload.single('file'), (req, res) => {
       });
       outname = req.file.filename + '_out.jpg';
     };
-    let outpath = 'tmp/' + outname
+
+    const outpath = 'tmp/' + outname
     image.toFile(outpath, (err, info) => {
       try {
         console.log(info);
-        console.log(outpath);
+        console.log('Saveto:' + outpath);
         let outfile = fs.readFileSync(outpath);
         res.set({'Content-Disposition': `attachment; filename=${outname}`});
         res.send(outfile);
@@ -77,15 +89,24 @@ app.post('/upload', upload.single('file'), (req, res) => {
         remove(outpath);
       } catch(e) {
         res.status(500).send('Error');
-        remove(req.file.path);
-        remove(outpath);
+        if (typeof req.file !== 'undefined') {
+          remove(req.file.path);
+        };
+        if (typeof outpath !== 'undefined') {
+          remove(outpath);
+        };
       };
+
     });
   } catch(e) {
     res.status(500).send('Error');
     console.log(e);
-    remove(req.file.path);
-    remove(outpath);
+    if (typeof req.file !== 'undefined') {
+      remove(req.file.path);
+    };
+    if (typeof outpath !== 'undefined') {
+      remove(outpath);
+    };
   };
 });
 
