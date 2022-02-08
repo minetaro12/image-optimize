@@ -61,14 +61,15 @@ app.post('/upload', upload.single('file'), (req, res) => {
     };
 
     let outname;
-    if (req.body.format == 'jpeg' || req.body.format == 'jpg' || req.body.format == 'png' || req.body.format == 'webp') { //formatがあれば指定
+    if (req.body.format == 'png' || req.body.format == 'webp') { //formatがあれば指定
       image.toFormat(req.body.format, {
         quality: outquality
       });
       outname = req.file.filename + '_out.' + req.body.format;
     } else {
       image.toFormat('jpg', { //なければjpg
-        quality: outquality
+        quality: outquality,
+        mozjpeg: true
       });
       outname = req.file.filename + '_out.jpg';
     };
