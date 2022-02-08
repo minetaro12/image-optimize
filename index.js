@@ -85,6 +85,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
         remove(outpath);
       } catch(e) {
         res.status(500).send('Error');
+        console.log(e);
         if (typeof req.file !== 'undefined') {
           remove(req.file.path);
         };
@@ -92,8 +93,8 @@ app.post('/upload', upload.single('file'), (req, res) => {
           remove(outpath);
         };
       };
-
     });
+
   } catch(e) {
     res.status(500).send('Error');
     console.log(e);
@@ -107,5 +108,5 @@ app.post('/upload', upload.single('file'), (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log('Server listen on port ' + port)
+  console.log('Server listen on port ' + port);
 });
