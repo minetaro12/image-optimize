@@ -36,11 +36,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     if (typeof req.file == 'undefined') {throw new Error('No file')};
 
     //画像かどうか
-    if (req.file.mimetype == 'image/jpeg' || req.file.mimetype == 'image/png' || req.file.mimetype == 'image/webp') {
-      //そのまま続行
-    } else {
-      throw new Error('Invalid type')
-    };
+    if (req.file.mimetype != 'image/jpeg' && req.file.mimetype != 'image/png' && req.file.mimetype != 'image/webp') {throw new Error('Invalid type')};
 
     console.log('\n' + req.file.path + '\n mimetype:' + req.file.mimetype + '\n quality:' + req.body.quality + '\n format:' + req.body.format + '\n size:' + req.body.size);
     const image = sharp(req.file.path);
