@@ -1,8 +1,8 @@
-import express = require('express');
+import express from 'express';
 const app = express();
 const port = process.env.PORT || 8000;
 
-import multer = require('multer');
+import multer from 'multer';
 const upload = multer({
   dest: 'tmp/',
   limits: {
@@ -11,9 +11,9 @@ const upload = multer({
   }
 });
 
-import fs = require('fs');
+import fs from 'fs';
 
-import sharp = require('sharp');
+import sharp from 'sharp';
 
 app.use(express.urlencoded({extended: true}));
 

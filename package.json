@@ -5,8 +5,8 @@
   "author": "minetaro12 <osawa2003@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc index.ts",
-    "start": "node index.js"
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "@types/express": "^4.17.13",
