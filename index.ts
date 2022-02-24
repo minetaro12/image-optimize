@@ -26,9 +26,9 @@ app.post('/', upload.single('file'), (req,res) => {
           quality: 75
         })
         .toFile(req.file?.path + '_out');
-        const outfile = fs.readFileSync(req.file?.path + '_out');
-        res.set({'Content-Disposition': `attachment; filename=${req.file?.filename + '_out.jpg'}`});
-        res.send(outfile);
+      const outfile = fs.readFileSync(req.file?.path + '_out');
+      res.set({'Content-Disposition': `attachment; filename=${req.file?.filename + '_out.jpg'}`});
+      res.send(outfile);
     })();
   } else {
     res.end();
