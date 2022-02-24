@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" http-equiv="content-type" charset="utf-8">
+    <title>画像圧縮</title>
+  </head>
+  <body>
+    <h1>画像圧縮</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <p><input type="file" name="file" accept="image/*" required></p>
+      <p>フォーマット:<select name="format">
+        <option value="jpg">jpeg</option>
+        <option value="webp">webp</option>
+        <option value="png">png</option>
+      </select></p>
+      <p>リサイズ:<input type="number" value="100" name="size" min="1" max="100" required>%</p>
+      <p>画質:<input type="number" value="75" name="quality" min="1" max="100" required></p>
+      <p><input type="submit" value="圧縮"></p>
+    </form>
+    <p>アップロードされた画像データは変換終了後に削除されます</p>
+    <hr>
+    <footer>&copy;2022 minetaro12 <a href="https://github.com/minetaro12/image-optimize" target="_blank">src</a></footer>
+  </body>
+</html>
