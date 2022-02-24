@@ -27,7 +27,7 @@ router.post('/', upload.single('file'), (req,res) => {
         if (!isNaN(req.body.size) && req.body.size != '') { //sizeが指定されている場合はリサイズ
           let inwidth = sizeOf(req.file.path).width; //元画像の横サイズを取得
           if (inwidth) {
-            let outwidth = Math.round(inwidth * ( req.body.size / 100 )); //sizeからサイズを計算&四捨五入
+            outwidth = Math.round(inwidth * ( req.body.size / 100 )); //sizeからサイズを計算&四捨五入
             console.log('Resized');
           };
         };
