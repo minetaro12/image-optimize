@@ -13,7 +13,16 @@ const upload = multer({
 import fs from 'fs';
 import sharp from 'sharp';
 import sizeOf from 'image-size';
-import { visitFunctionBody } from 'typescript';
+
+//一時ファイルの削除
+const remove = function(file: string) {
+  if(fs.existsSync(file)) {
+    fs.unlinkSync(file);
+    console.log(`Removed: ${file}`);
+  } else {
+    console.log(`Skip: ${file}`);
+  }
+};
 
 router.post('/', upload.single('file'), (req,res) => {
   if (req.file) {
@@ -45,33 +54,38 @@ router.post('/', upload.single('file'), (req,res) => {
         };
 
         let outname;
-        let outpach;
+        let outpath;
         if (req.body.format == 'png' || req.body.format == 'webp') { //formatがあれば指定
           outname = req.file.filename + '_out.' + req.body.format;
-          outpach = req.file.path + '_out.' + req.body.format;
+          outpath = req.file.path + '_out.' + req.body.format;
           await sharp(req.file?.path)
             .resize(outwidth, null)
             .toFormat(req.body.format, {
               quality: outquality
             })
-            .toFile(outpach);
-          console.log(outpach);
+            .toFile(outpath);
+          console.log(outpath);
         } else {
           outname = req.file.filename + '_out.jpg';
-          outpach = req.file.path + '_out.jpg';
+          outpath = req.file.path + '_out.jpg';
           await sharp(req.file?.path)
             .resize(outwidth, null)
             .toFormat('jpg', {
               mozjpeg: true,
               quality: outquality
             })
-            .toFile(outpach);
-          console.log(outpach);
+            .toFile(outpath);
+          console.log(outpath);
         };
 
-        const outfile = fs.readFileSync(outpach);
+        //ファイルの送信
+        const outfile = fs.readFileSync(outpath);
         res.set({'Content-Disposition': `attachment; filename=${outname}`});
         res.send(outfile);
+
+        //一時ファイルの削除
+        remove(req.file.path);
+        remove(outpath);
 
       } catch(e) {
         console.log(e);
