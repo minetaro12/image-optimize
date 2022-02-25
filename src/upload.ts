@@ -16,32 +16,41 @@ import sizeOf from 'image-size';
 
 //一時ファイルの削除
 const remove = function(file: string) {
-  if(fs.existsSync(file)) {
-    fs.unlinkSync(file);
-    console.log(`Removed: ${file}`);
-  } else {
-    console.log(`Skip: ${file}`);
-  }
+  try {
+    if(fs.existsSync(file)) {
+      fs.unlinkSync(file);
+      console.log(`Removed: ${file}`);
+    } else {
+      console.log(`Skip: ${file}`);
+    };
+  } catch(e) {
+    console.log('Remove Error');
+  };
 };
 
 router.post('/', upload.single('file'), (req,res) => {
   if (req.file) {
     (async () => {
+      let outwidth;
+      let outquality;
+      let outpath;
+      let outname;
+
       try {
         //画像かどうか
         if (req.file?.mimetype != 'image/jpeg' && req.file?.mimetype != 'image/png' && req.file?.mimetype != 'image/webp') {throw new Error('Invalid type')};
         console.log(`\n${req.file.path}\nmimetype: ${req.file.mimetype}\nquality: ${req.body.quality}\nformat: ${req.body.format}\nsize: ${req.body.size}`);
 
-        let outwidth
         if (!isNaN(req.body.size) && req.body.size != '') { //sizeが指定されている場合はリサイズ
           let inwidth = sizeOf(req.file.path).width; //元画像の横サイズを取得
           if (inwidth) {
             outwidth = Math.round(inwidth * ( req.body.size / 100 )); //sizeからサイズを計算&四捨五入
             console.log('Resized');
           };
+        } else {
+          outwidth = sizeOf(req.file.path).width
         };
 
-        let outquality;
         if (!isNaN(req.body.quality) && req.body.quality != '') { //qualityがあれば指定
           let numquality = Number(req.body.quality);
           if (1 <= numquality && numquality <= 100) {
@@ -53,8 +62,6 @@ router.post('/', upload.single('file'), (req,res) => {
           outquality = 75;
         };
 
-        let outname;
-        let outpath;
         if (req.body.format == 'png' || req.body.format == 'webp') { //formatがあれば指定
           outname = req.file.filename + '_out.' + req.body.format;
           outpath = req.file.path + '_out.' + req.body.format;
@@ -90,6 +97,8 @@ router.post('/', upload.single('file'), (req,res) => {
       } catch(e) {
         console.log(e);
         res.status(500).send('Error');
+        if (req.file) {remove(req.file.path)};
+        if (outpath) {remove(outpath)};
       }
     })();
   } else {
