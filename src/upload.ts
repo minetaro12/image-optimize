@@ -17,75 +17,84 @@ import remove from './remove';
 
 router.post('/', upload.single('file'), (req,res) => {
   if (req.file) {
-    (async () => {
-      let outwidth;
-      let outquality;
-      let outpath;
-      let outname;
+    const originPath = req.file.path;
+    const originName = req.file.filename;
+    const originMime = req.file.mimetype;
+    const originSize = req.file.size;
 
+    const sizeOp = req.body.size;
+    const qualityOp = req.body.quality;
+    const formatOp = req.body.format;
+
+    let outWidth;
+    let outQuality;
+    let outPath;
+    let outName;
+
+     (async () => {
       try {
         //画像かどうか
-        if (req.file?.mimetype != 'image/jpeg' && req.file?.mimetype != 'image/png' && req.file?.mimetype != 'image/webp') {throw new Error('Invalid type')};
-        console.log(`\n${req.file.path}\nmimetype: ${req.file.mimetype}\nquality: ${req.body.quality}\nformat: ${req.body.format}\nsize: ${req.body.size}`);
+        if (originMime != 'image/jpeg' && originMime != 'image/png' && originMime != 'image/webp') {throw new Error('Invalid type')};
+        console.log(`\n${originPath}\nmimetype: ${originMime}\nquality: ${qualityOp}\nformat: ${formatOp}\nsize: ${originSize}`);
 
-        if (!isNaN(req.body.size) && req.body.size != '') { //sizeが指定されている場合はリサイズ
-          let inwidth = sizeOf(req.file.path).width; //元画像の横サイズを取得
-          if (inwidth) {
-            outwidth = Math.round(inwidth * ( req.body.size / 100 )); //sizeからサイズを計算&四捨五入
+        if (!isNaN(sizeOp) && sizeOp != '') { //sizeが指定されている場合はリサイズ
+          const inWidth = sizeOf(originPath).width; //元画像の横サイズを取得
+          if (inWidth) {
+            outWidth = Math.round(inWidth * ( sizeOp / 100 )); //sizeからサイズを計算&四捨五入
             console.log('Resized');
           };
         } else {
-          outwidth = sizeOf(req.file.path).width
+          outWidth = sizeOf(originPath).width
         };
 
-        if (!isNaN(req.body.quality) && req.body.quality != '') { //qualityがあれば指定
-          let numquality = Number(req.body.quality);
-          if (1 <= numquality && numquality <= 100) {
-            outquality = numquality;
+        if (!isNaN(qualityOp) && qualityOp != '') { //qualityがあれば指定
+          const numQuality = Number(qualityOp);
+          if (1 <= numQuality && numQuality <= 100) {
+            outQuality = numQuality;
           } else {
-            outquality = 75;
+            outQuality = 75;
           };
         } else { //なければ75
-          outquality = 75;
+          outQuality = 75;
         };
 
-        if (req.body.format == 'png' || req.body.format == 'webp') { //formatがあれば指定
-          outname = req.file.filename + '_out.' + req.body.format;
-          outpath = req.file.path + '_out.' + req.body.format;
-          await sharp(req.file?.path)
-            .resize(outwidth, null)
-            .toFormat(req.body.format, {
-              quality: outquality
+        if (formatOp == 'png' || formatOp == 'webp') { //formatがあれば指定
+          outName = `${originName}_out.${formatOp}`;
+          outPath = `${originPath}_out.${formatOp}`;
+          await sharp(originPath)
+            .resize(outWidth, null)
+            .toFormat(formatOp, {
+              quality: outQuality
             })
-            .toFile(outpath);
-          console.log(outpath);
+            .toFile(outPath);
+          console.log(outPath);
         } else {
-          outname = req.file.filename + '_out.jpg';
-          outpath = req.file.path + '_out.jpg';
-          await sharp(req.file?.path)
-            .resize(outwidth, null)
+          outName = `${originName}_out.jpg`;
+          outPath = `${originPath}_out.jpg`;
+          await sharp(originPath)
+            .resize(outWidth, null)
             .toFormat('jpg', {
               mozjpeg: true,
-              quality: outquality
+              quality: outQuality
             })
-            .toFile(outpath);
-          console.log(outpath);
+            .toFile(outPath);
+          console.log(outPath);
         };
 
         //ファイルの送信
-        const outfile = fs.readFileSync(outpath);
-        res.set({'Content-Disposition': `attachment; filename=${outname}`});
-        res.send(outfile);
+        const outFile = fs.readFileSync(outPath);
+        res.set({'Content-Disposition': `attachment; filename=${outName}`});
+        res.send(outFile);
 
         //一時ファイルの削除
-        remove(req.file.path);
-        remove(outpath);
+        remove(originPath);
+        remove(outPath);
 
       } catch(e) {
         console.log(e);
         res.status(500).send('Error');
-        if (req.file) {remove(req.file.path)};
-        if (outpath) {remove(outpath)};
+        remove(originPath)
+        if (outPath) {remove(outPath)};
       }
     })();
   } else {
