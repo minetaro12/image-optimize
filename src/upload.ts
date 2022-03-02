@@ -13,20 +13,7 @@ const upload = multer({
 import fs from 'fs';
 import sharp from 'sharp';
 import sizeOf from 'image-size';
-
-//一時ファイルの削除
-const remove = function(file: string) {
-  try {
-    if(fs.existsSync(file)) {
-      fs.unlinkSync(file);
-      console.log(`Removed: ${file}`);
-    } else {
-      console.log(`Skip: ${file}`);
-    };
-  } catch(e) {
-    console.log('Remove Error');
-  };
-};
+import remove from './remove';
 
 router.post('/', upload.single('file'), (req,res) => {
   if (req.file) {
