@@ -20,13 +20,12 @@ router.post('/', upload.single('file'), (req,res) => {
     const originPath = req.file.path;
     const originName = req.file.filename;
     const originMime = req.file.mimetype;
-    const originSize = req.file.size;
 
     const sizeOp = req.body.size;
     const qualityOp = req.body.quality;
     const formatOp = req.body.format;
+    const removemetaOp = req.body.removemeta;
 
-    let outWidth;
     let outQuality;
     let outPath;
     let outName;
@@ -35,16 +34,24 @@ router.post('/', upload.single('file'), (req,res) => {
       try {
         //画像かどうか
         if (originMime != 'image/jpeg' && originMime != 'image/png' && originMime != 'image/webp') {throw new Error('Invalid type')};
-        console.log(`\n${originPath}\nmimetype: ${originMime}\nquality: ${qualityOp}\nformat: ${formatOp}\nsize: ${originSize}`);
+        console.log(`\n${originPath}\nmimetype: ${originMime}\nresize: ${sizeOp}\nquality: ${qualityOp}\nformat: ${formatOp}\nremovemeta: ${removemetaOp}\n`);
 
-        if (!isNaN(sizeOp) && sizeOp != '') { //sizeが指定されている場合はリサイズ
+        const image = sharp(originPath);
+
+        if (removemetaOp == '1') { //メタデータ削除が指定された場合
+          console.log('Remove meta');
+        } else {
+          image.withMetadata();
+          console.log('Keep meta');
+        };
+
+        if (!isNaN(sizeOp) && sizeOp != '' && sizeOp != '100') { //sizeが指定されている場合はリサイズ
           const inWidth = sizeOf(originPath).width; //元画像の横サイズを取得
           if (inWidth) {
-            outWidth = Math.round(inWidth * ( sizeOp / 100 )); //sizeからサイズを計算&四捨五入
+            const outWidth = Math.round(inWidth * ( sizeOp / 100 )); //sizeからサイズを計算&四捨五入
+            image.resize(outWidth);
             console.log('Resized');
           };
-        } else {
-          outWidth = sizeOf(originPath).width
         };
 
         if (!isNaN(qualityOp) && qualityOp != '') { //qualityがあれば指定
@@ -61,8 +68,7 @@ router.post('/', upload.single('file'), (req,res) => {
         if (formatOp == 'png' || formatOp == 'webp') { //formatがあれば指定
           outName = `${originName}_out.${formatOp}`;
           outPath = `${originPath}_out.${formatOp}`;
-          await sharp(originPath)
-            .resize(outWidth, null)
+          await image
             .toFormat(formatOp, {
               quality: outQuality
             })
@@ -71,8 +77,7 @@ router.post('/', upload.single('file'), (req,res) => {
         } else {
           outName = `${originName}_out.jpg`;
           outPath = `${originPath}_out.jpg`;
-          await sharp(originPath)
-            .resize(outWidth, null)
+          await image
             .toFormat('jpg', {
               mozjpeg: true,
               quality: outQuality
