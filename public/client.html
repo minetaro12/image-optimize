@@ -23,11 +23,19 @@
               <option value="png">png</option>
             </select>
           </div>
-          <div class="input-group mb-3">
-            <span class="input-group-text">Resize</span>
-            <input type="number" class="form-control" value="100" name="size" min="1" max="100" required>
-            <span class="input-group-text">%</span>
-          </div>
+          <p>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Resize</span>
+              <input type="number" class="form-control" value="100" name="size" min="1" max="100" id="resizeOp" required>
+              <span class="input-group-text">%</span>
+            </div>
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <input type="button" class="btn btn-outline-secondary" onclick="sizeChange(100)" value="100%">
+              <input type="button" class="btn btn-outline-secondary" onclick="sizeChange(70)" value="70%">
+              <input type="button" class="btn btn-outline-secondary" onclick="sizeChange(50)" value="50%">
+              <input type="button" class="btn btn-outline-secondary" onclick="sizeChange(30)" value="30%">
+            </div>
+          </p>
           <div class="input-group mb-3">
             <span class="input-group-text">Quality</span>
             <input type="number" class="form-control" value="75" name="quality" min="1" max="100" required>
@@ -45,6 +53,7 @@
       <hr>
       <footer>&copy;2022 minetaro12 <a href="https://github.com/minetaro12/image-optimize" target="_blank">src</a></footer>
   </div>
+    <script src="/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   </body>
 </html>
