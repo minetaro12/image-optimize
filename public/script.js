@@ -3,6 +3,7 @@ const formatOp = document.getElementById('formatOp');
 const resizeOp = document.getElementById('resizeOp');
 const qualityOp = document.getElementById('qualityOp');
 const removemetaOp = document.getElementById('removemetaOp');
+const grayOp = document.getElementById('grayOp');
 
 const statusArea = document.getElementById('statusArea');
 
@@ -47,6 +48,9 @@ const submit = function() {
   fd.append('quality', qualityOp.value);
   if(removemetaOp.checked == true) {
     fd.append('removemeta', '1');
+  };
+  if(grayOp.checked == true) {
+    fd.append('gray', '1');
   };
 
   //送信

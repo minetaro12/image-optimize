@@ -25,6 +25,7 @@ router.post('/', upload.single('file'), (req,res) => {
     const qualityOp = req.body.quality;
     const formatOp = req.body.format;
     const removemetaOp = req.body.removemeta;
+    const grayOp = req.body.gray;
 
     let outQuality;
     let outPath;
@@ -34,7 +35,7 @@ router.post('/', upload.single('file'), (req,res) => {
       try {
         //画像かどうか
         if (originMime != 'image/jpeg' && originMime != 'image/png' && originMime != 'image/webp') {throw new Error('Invalid type')};
-        console.log(`\n${originPath}\nmimetype: ${originMime}\nresize: ${sizeOp}\nquality: ${qualityOp}\nformat: ${formatOp}\nremovemeta: ${removemetaOp}\n`);
+        console.log(`\n${originPath}\nmimetype: ${originMime}\nresize: ${sizeOp}\nquality: ${qualityOp}\nformat: ${formatOp}\nremovemeta: ${removemetaOp}\ngrayscale: ${grayOp}\n`);
 
         const image = sharp(originPath);
 
@@ -63,6 +64,11 @@ router.post('/', upload.single('file'), (req,res) => {
           };
         } else { //なければ75
           outQuality = 75;
+        };
+
+        if (grayOp == '1') { //グレースケールオプション
+          image.grayscale();
+          console.log('Grayscale');
         };
 
         if (formatOp == 'png' || formatOp == 'webp') { //formatがあれば指定
