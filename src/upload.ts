@@ -17,19 +17,19 @@ import remove from './remove';
 
 router.post('/', upload.single('file'), (req,res) => {
   if (req.file) {
-    const originPath = req.file.path;
-    const originName = req.file.filename;
-    const originMime = req.file.mimetype;
+    const originPath: string = req.file.path;
+    const originName: string = req.file.filename;
+    const originMime: string = req.file.mimetype;
 
-    const sizeOp = req.body.size;
-    const qualityOp = req.body.quality;
-    const formatOp = req.body.format;
-    const removemetaOp = req.body.removemeta;
-    const grayOp = req.body.gray;
+    const sizeOp: string = req.body.size;
+    const qualityOp: string = req.body.quality;
+    const formatOp: string = req.body.format;
+    const removemetaOp: string = req.body.removemeta;
+    const grayOp: string = req.body.gray;
 
-    let outQuality;
-    let outPath;
-    let outName;
+    let outQuality: number;
+    let outPath: string|undefined;
+    let outName: string;
 
      (async () => {
       try {
@@ -46,17 +46,18 @@ router.post('/', upload.single('file'), (req,res) => {
           console.log('Keep meta');
         };
 
-        if (!isNaN(sizeOp) && sizeOp != '' && sizeOp != '100') { //sizeが指定されている場合はリサイズ
-          const inWidth = sizeOf(originPath).width; //元画像の横サイズを取得
+        if (sizeOp && sizeOp != '' && sizeOp != '100') { //sizeが指定されている場合はリサイズ
+          const inWidth: number|undefined = sizeOf(originPath).width; //元画像の横サイズを取得
           if (inWidth) {
-            const outWidth = Math.round(inWidth * ( sizeOp / 100 )); //sizeからサイズを計算&四捨五入
+            const numSize: number = Number(sizeOp);
+            const outWidth: number = Math.round(inWidth * ( numSize / 100 )); //sizeからサイズを計算&四捨五入
             image.resize(outWidth);
             console.log('Resized');
           };
         };
 
-        if (!isNaN(qualityOp) && qualityOp != '') { //qualityがあれば指定
-          const numQuality = Number(qualityOp);
+        if (qualityOp && qualityOp != '') { //qualityがあれば指定
+          const numQuality: number = Number(qualityOp);
           if (1 <= numQuality && numQuality <= 100) {
             outQuality = numQuality;
           } else {
@@ -93,7 +94,7 @@ router.post('/', upload.single('file'), (req,res) => {
         };
 
         //ファイルの送信
-        const outFile = fs.readFileSync(outPath);
+        const outFile: Buffer = fs.readFileSync(outPath);
         res.set({'Content-Disposition': `attachment; filename=${outName}`});
         res.send(outFile);
 
