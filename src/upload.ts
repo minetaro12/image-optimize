@@ -12,6 +12,9 @@ const upload = multer({
 import sharp from 'sharp';
 import sizeOf from 'image-size';
 import path from 'path';
+import log4js from 'log4js';
+const logger = log4js.getLogger();
+logger.level = 'info';
 
 router.post('/', upload.single('file'), (req,res) => {
   if (req.file) {
@@ -28,18 +31,24 @@ router.post('/', upload.single('file'), (req,res) => {
       try {
         //画像かどうか
         if (originMime != 'image/jpeg' && originMime != 'image/png' && originMime != 'image/webp') {throw new Error('Invalid type')};
-        console.log(`\n${originMime}\nresize: ${sizeOp}\nquality: ${qualityOp}\nformat: ${formatOp}\nremovemeta: ${removemetaOp}\ngrayscale: ${grayOp}\n`);
+        logger.info(`${originName}\n\
+type: ${originMime}\n\
+resize: ${sizeOp}\n\
+quality: ${qualityOp}\n\
+format: ${formatOp}\n\
+removemeta: ${removemetaOp}\n\
+grayscale: ${grayOp}`);
 
         if (!req.file?.buffer) {
-          throw new Error('Buffer not fount');
+          throw new Error('Buffer not found');
         };
         const image = sharp(req.file.buffer);
 
         if (removemetaOp == '1') { //メタデータ削除が指定された場合
-          console.log('Remove meta');
+          logger.debug('Remove meta');
         } else {
           image.withMetadata();
-          console.log('Keep meta');
+          logger.debug('Keep meta');
         };
 
         if (sizeOp && sizeOp != '' && sizeOp != '100') { //sizeが指定されている場合はリサイズ
@@ -48,7 +57,7 @@ router.post('/', upload.single('file'), (req,res) => {
             const numSize: number = Number(sizeOp);
             const outWidth: number = Math.round(inWidth * ( numSize / 100 )); //sizeからサイズを計算&四捨五入
             image.resize(outWidth);
-            console.log('Resized');
+            logger.debug('Resized');
           };
         };
 
@@ -66,7 +75,7 @@ router.post('/', upload.single('file'), (req,res) => {
 
         if (grayOp == '1') { //グレースケールオプション
           image.grayscale();
-          console.log('Grayscale');
+          logger.debug('Grayscale');
         };
 
         let outBuffer: Buffer;
@@ -92,9 +101,10 @@ router.post('/', upload.single('file'), (req,res) => {
         //ファイルの送信
         res.set({'Content-Disposition': `attachment; filename=${outName}`});
         res.send(outBuffer);
+        logger.info('Complete');
 
       } catch(e) {
-        console.log(e);
+        logger.error(e);
         res.status(500).send('Error');
       }
       
