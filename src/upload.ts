@@ -2,7 +2,6 @@ import express from 'express';
 const router = express.Router();
 
 import multer from 'multer';
-//const inBuffer = multer.memoryStorage();
 const upload = multer({
   limits: {
     fileSize: 10485760, //10MB
@@ -31,13 +30,10 @@ router.post('/', upload.single('file'), (req,res) => {
         if (originMime != 'image/jpeg' && originMime != 'image/png' && originMime != 'image/webp') {throw new Error('Invalid type')};
         console.log(`\n${originMime}\nresize: ${sizeOp}\nquality: ${qualityOp}\nformat: ${formatOp}\nremovemeta: ${removemetaOp}\ngrayscale: ${grayOp}\n`);
 
-        let inBuffer: Buffer;
-        if (req.file?.buffer) {
-          inBuffer = req.file.buffer;
-        } else {
+        if (!req.file?.buffer) {
           throw new Error('Buffer not fount');
         };
-        const image = sharp(inBuffer);
+        const image = sharp(req.file.buffer);
 
         if (removemetaOp == '1') { //メタデータ削除が指定された場合
           console.log('Remove meta');
@@ -47,7 +43,7 @@ router.post('/', upload.single('file'), (req,res) => {
         };
 
         if (sizeOp && sizeOp != '' && sizeOp != '100') { //sizeが指定されている場合はリサイズ
-          const inWidth: number|undefined = sizeOf(inBuffer).width; //元画像の横サイズを取得
+          const inWidth: number|undefined = sizeOf(req.file.buffer).width; //元画像の横サイズを取得
           if (inWidth) {
             const numSize: number = Number(sizeOp);
             const outWidth: number = Math.round(inWidth * ( numSize / 100 )); //sizeからサイズを計算&四捨五入
