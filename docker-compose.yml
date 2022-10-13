@@ -2,7 +2,8 @@ version: "3"
 
 services:
   server:
-    build: .
+    #build: .
+    image: ghcr.io/minetaro12/image-optimize:latest
     restart: always
     ports:
       - "8000:8000"
