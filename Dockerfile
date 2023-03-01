@@ -1,14 +1,15 @@
-FROM node:lts-alpine
+FROM golang:1.20.1-alpine3.17 AS builder
 
-WORKDIR /server
+WORKDIR /work
+COPY . ./
+RUN apk add --no-cache alpine-sdk vips-dev && \
+    go build
 
-#ファイルのコピー
-COPY ./ /server/
+FROM alpine:3.17.2
+RUN apk add --no-cache vips
+WORKDIR /app
+COPY --from=builder /work/image-optimize /app
 
-#依存関係のインストール
-RUN yarn install && \
-    yarn build && \
-    yarn cache clean && \
-    rm -rf /root/.npm
+EXPOSE 8000
 
-CMD /usr/local/bin/yarn start
+ENTRYPOINT ["/app/image-optimize"]

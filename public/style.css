@@ -1,4 +1,13 @@
-body {
-  margin-top: 20px;
+.container {
+  margin: 1rem auto;
+  max-width: 800px;
+  padding: 0 1rem;
 }
 
+input[type="file"] {
+  display: none;
+}
+
+.hide {
+  display: none;
+}
