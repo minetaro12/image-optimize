@@ -1,13 +1,17 @@
 # image-optimize
 
 ## 使い方
-`yarn install` 依存関係のインストール
+```
+#ビルド
+$ go build
 
-`yarn build` ビルド
+#実行
+$ ./image-optimize
 
-`yarn start` or `PORT=9000 yarn start` 起動
+$ PORT=8080 ./image-optimize
+```
 
 ## Dockerの場合
-`docker compose build` ビルド
-
-`docker compose up -d` 起動
+```
+$ docker run -d -p 8000:8000 ghcr.io/minetaro12/image-optimize:latest
+```
